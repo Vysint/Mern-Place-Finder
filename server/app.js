@@ -7,6 +7,6 @@ const app = express();
 
 
 
-app.use(placesRoutes);
+app.use('/api/places', placesRoutes);
 
 app.listen(5001, () => console.log("Listening at 5001"));
