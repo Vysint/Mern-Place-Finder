@@ -66,10 +66,18 @@ exports.signUp = async (req, res, next) => {
   res.status(201).json({ user: createdUser.toObject({ getters: true }) });
 };
 
-exports.login = (req, res, next) => {
+exports.login = async (req, res, next) => {
   const { email, password } = req.body;
 
-  const identifiedUser = DUMMY_USERS.find((user) => user.email === email);
+  let identifiedUser;
+
+  try {
+    identifiedUser = await User.findOne({ email: email });
+  } catch (err) {
+    return next(
+      new HttpError("Logging in failed, please try again later.", 500)
+    );
+  }
 
   if (!identifiedUser || identifiedUser.password !== password) {
     return next(
