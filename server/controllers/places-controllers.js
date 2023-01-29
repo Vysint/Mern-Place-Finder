@@ -54,12 +54,12 @@ exports.getPlaceById = async (req, res, next) => {
   res.json({ place: place.toObject({ getters: true }) });
 };
 
-exports.getPlacesByUserId = (req, res, next) => {
+exports.getPlacesByUserId = async(req, res, next) => {
   const userId = req.params.uid;
 
   let userPlaces;
   try {
-    userPlaces = Place.find({ creator: userId });
+    userPlaces = await Place.find({ creator: userId });
   } catch (err) {
     const error = new HttpError(
       "Could not find the places for the provided user id.",
@@ -77,7 +77,7 @@ exports.getPlacesByUserId = (req, res, next) => {
     );
   }
   res.json({
-    userPlaces: userPlaces.map((place) => place.toObject({ getters: true })),
+    places: userPlaces.map((place) => place.toObject({ getters: true })),
   });
 };
 
@@ -119,7 +119,7 @@ exports.createPlace = async (req, res, next) => {
   res.status(201).json({ place: createdPlace });
 };
 
-exports.updatePlace = (req, res, next) => {
+exports.updatePlace = async (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
@@ -130,15 +130,32 @@ exports.updatePlace = (req, res, next) => {
 
   const placeId = req.params.pid;
 
-  const updatePlace = { ...DUMMY_PLACES.find((place) => place.id === placeId) };
-  const placeIndex = DUMMY_PLACES.findIndex((place) => place.id === placeId);
+  let place;
 
-  updatePlace.title = title;
-  updatePlace.description = description;
+  try {
+    place = await Place.findById(placeId);
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not find a place with the provided id.",
+      500
+    );
+    return next(error);
+  }
 
-  DUMMY_PLACES[placeIndex] = updatePlace;
+  place.title = title;
+  place.description = description;
 
-  res.status(200).json({ place: updatePlace });
+  try {
+    await place.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not update place.",
+      500
+    );
+    return next(error);
+  }
+
+  res.status(200).json({ place: place.toObject({ getters: true }) });
 };
 exports.deletePlace = (req, res, next) => {
   const placeId = req.params.pid;
