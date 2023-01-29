@@ -24,7 +24,7 @@ exports.signUp = async (req, res, next) => {
       new HttpError("Invalid inputs passed, please check your data.", 422)
     );
   }
-  const { name, email, password, places } = req.body;
+  const { name, email, password } = req.body;
 
   let existingUser;
 
@@ -52,7 +52,7 @@ exports.signUp = async (req, res, next) => {
     password,
     image:
       "https://upload.wikimedia.org/wikipedia/en/thumb/9/93/Burj_Khalifa.jpg/440px-Burj_Khalifa.jpg",
-    places,
+    places: [],
   });
 
   try {
