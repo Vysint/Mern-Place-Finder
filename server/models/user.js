@@ -4,7 +4,7 @@ const uniqueValidator = require("mongoose-unique-validator");
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
+    requred: true,
   },
   email: {
     type: String,
