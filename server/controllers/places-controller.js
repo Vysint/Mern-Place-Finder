@@ -1,9 +1,10 @@
-const { v4: uuidv4 } = require("uuid");
+const mongoose = require("mongoose");
 const { validationResult } = require("express-validator");
 
 const HttpError = require("../models/http-error");
 const getCoordsForAddress = require("../util/location");
 const Place = require("../models/place");
+const User = require("../models/user");
 
 exports.getPlaceById = async (req, res, next) => {
   const placeId = req.params.pid;
@@ -77,8 +78,25 @@ exports.createPlace = async (req, res, next) => {
       "https://upload.wikimedia.org/wikipedia/en/thumb/9/93/Burj_Khalifa.jpg/440px-Burj_Khalifa.jpg",
     creator,
   });
+  let user;
+
   try {
-    await createdPlace.save();
+    user = await User.findById(creator);
+  } catch (err) {
+    return next(new HttpError("Creating place failed, please try again.", 500));
+  }
+
+  if (!user) {
+    return next(new HttpError("Could not find user for the provided id", 404));
+  }
+
+  try {
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await createdPlace.save({ session: sess });
+    user.places.push(createdPlace);
+    await user.save({ session: sess });
+    await sess.commitTransaction();
   } catch (err) {
     const error = new HttpError(
       "Creating place failed, please try again.",
