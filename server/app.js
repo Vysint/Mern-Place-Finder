@@ -12,6 +12,22 @@ const app = express();
 app.use(bodyParser.json());
 dotenv.config();
 
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.setHeader(
+    "Acces-Control-Allow-Methods",
+    "GET",
+    "POST",
+    "PATCH",
+    "DELETE"
+  );
+  next();
+});
+
 app.use("/api/places", placesRoutes);
 
 app.use("/api/users", usersRoutes);
@@ -30,7 +46,7 @@ app.use((error, req, res, next) => {
     .json({ message: error.message || "An unknown error occurred!" });
 });
 
-mongoose.set('strictQuery', false)
+mongoose.set("strictQuery", false);
 
 mongoose
   .connect(process.env.MONGO_DB)
