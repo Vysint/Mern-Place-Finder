@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const cors = require("cors");
 
 const HttpError = require("./models/http-error");
 const placesRoutes = require("./routes/places-routes");
@@ -12,6 +13,7 @@ const app = express();
 app.use(bodyParser.json());
 dotenv.config();
 
+app.use(cors());
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
