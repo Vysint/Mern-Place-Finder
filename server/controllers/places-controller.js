@@ -6,6 +6,7 @@ const getCoordsForAddress = require("../util/location");
 const Place = require("../models/place");
 const User = require("../models/user");
 
+
 exports.getPlaceById = async (req, res, next) => {
   const placeId = req.params.pid;
 
@@ -74,8 +75,7 @@ exports.createPlace = async (req, res, next) => {
     description,
     address,
     location: coordinates,
-    image:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/9/93/Burj_Khalifa.jpg/440px-Burj_Khalifa.jpg",
+    image:req.file.path, 
     creator,
   });
   let user;
