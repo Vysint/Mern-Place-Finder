@@ -86,12 +86,29 @@ exports.login = async (req, res, next) => {
     );
   }
 
-  if (!identifiedUser || identifiedUser.password !== password) {
+  if (!identifiedUser) {
     return next(
       new HttpError(
         "Could not identify user, credentials seem to be wrong.",
         401
       )
+    );
+  }
+
+  let isValidPassword;
+  try {
+    isValidPassword = await bcrypt.compare(password, identifiedUser.password);
+  } catch (err) {
+    return next(
+      new HttpError(
+        "Could not log you in, please check your credentials and try again.",
+        500
+      )
+    );
+  }
+  if (!isValidPassword) {
+    return next(
+      new HttpError("Invalid credentials, could not log you in.", 500)
     );
   }
   res.json({
