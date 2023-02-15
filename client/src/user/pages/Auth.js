@@ -81,7 +81,7 @@ const Auth = () => {
           }
         );
 
-        auth.login(responseData.userId);
+        auth.login(responseData.userId, responseData.token);
       } catch (err) {}
     } else {
       try {
@@ -96,7 +96,7 @@ const Auth = () => {
           formData
         );
 
-        auth.login(responseData.userId);
+        auth.login(responseData.userId, responseData.token);
       } catch (err) {}
     }
   };
